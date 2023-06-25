@@ -44,7 +44,8 @@ $ docker compose up -d
 ## Expected result
 
 Listing containers must show one container running and the port mapping as below:
-```
+
+```bash
 $ docker ps
 CONTAINER ID   IMAGE                           COMMAND                  CREATED          STATUS          PORTS                                       NAMES
 229465b887af   java-scala-dockerized-project   "/bin/sh -c 'java -j…"   11 minutes ago   Up 11 minutes   0.0.0.0:8080->8080/tcp, :::8080->8080/tcp   java-scala-dockerized-project-1
