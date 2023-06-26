@@ -1,66 +1,39 @@
-## Compose sample application
+# Alpine Linux
 
-### Use with Docker Development Environments
+Many Docker Apache Spark images are based on heavy-weight Debian images. This is based on Alpine Linux which is optimized for containers and light-weight.
 
-You can open this sample in the Dev Environments feature of Docker Desktop version 4.12 or later.
+# spark
 
-### Spark Java
+A [Spark](http://spark.apache.org) container. Use it in a standalone cluster with the accompanying `docker-compose.yml`, or as a base for more complex recipes.
 
-Project structure:
-```
-.
-├── compose.yaml
-├── Dockerfile
-├── README.md
-└── src
-    └── ...
-```
+## docker example
 
-[_compose.yaml_](compose.yaml)
-```
-services:
-  java-scala-dockerized:
-    build: .
-    ports:
-    - 8080:8080
-```
-The compose file defines an application with one service `java-scala-dockerized`.
-When deploying the application, docker compose maps port 8080 of the java-scala-dockerized service container to port 8080 of the host as specified in the file.
-Make sure port 8080 on the host is not already being in use.
+To run `SparkPi`, run the image with Docker:
 
-## Deploy with docker compose
+    docker run --rm -it -p 4040:4040 riyadparvez/spark bin/run-example SparkPi 10
 
-```
-$ docker compose up -d
-[+] Building 2.2s (16/16) FINISHED                                                                                                                               
- => [java-scala-dockerized internal] load build definition from Dockerfile                                                                                  0.0s
- => => transferring dockerfile: 781B                                                                                                                        0.0s
- => [java-scala-dockerized internal] load .dockerignore                                                                                                     0.1s
-...
-[+] Running 2/2
- ✔ Network java-scala-dockerized_default                    Created                                                                                         0.1s 
- ✔ Container java-scala-dockerized-java-scala-dockerized-1  Started                                                                                         0.6s ```
+To start `spark-shell` with your AWS credentials:
 
-## Expected result
+    docker run --rm -it -e "AWS_ACCESS_KEY_ID=YOURKEY" -e "AWS_SECRET_ACCESS_KEY=YOURSECRET" -p 4040:4040 riyadparvez/spark bin/spark-shell
 
-Listing containers must show one container running and the port mapping as below:
+To do a thing with Pyspark
 
-```bash
-$ docker ps
-CONTAINER ID   IMAGE                           COMMAND                  CREATED          STATUS          PORTS                                       NAMES
-229465b887af   java-scala-dockerized-project   "/bin/sh -c 'java -j…"   11 minutes ago   Up 11 minutes   0.0.0.0:8080->8080/tcp, :::8080->8080/tcp   java-scala-dockerized-project-1
-```
+    echo "import pyspark\nprint(pyspark.SparkContext().parallelize(range(0, 10)).count())" > count.py
+    docker run --rm -it -p 4040:4040 -v $(pwd)/count.py:/count.py riyadparvez/spark bin/pyspark /count.py
 
-After the application starts, navigate to `http://localhost:8080` in your web browser or run:
-```
-$ curl localhost:8080
-Hello from Docker!
-```
+## docker-compose example
 
-Stop and remove the containers
-```
-$ docker compose down
-[+] Running 2/2
- ✔ Container java-scala-dockerized-project-1  Removed                                                                                                      10.5s 
- ✔ Network java-scala-dockerized_default      Removed 
- ```
+To create a simplistic standalone cluster with [docker-compose](http://docs.docker.com/compose):
+
+    docker-compose up
+
+The SparkUI will be running at `http://${YOUR_DOCKER_HOST}:8080` with one worker listed. To run `pyspark`, exec into a container:
+
+    docker exec -it dockerspark_master_1 /bin/bash
+    bin/pyspark
+
+To run `SparkPi`, exec into a container:
+
+    docker exec -it dockerspark_master_1 /bin/bash
+    bin/run-example SparkPi 10
+s

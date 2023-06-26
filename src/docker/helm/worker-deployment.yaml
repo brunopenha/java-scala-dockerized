@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: worker
+  name: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: worker
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yaml
+        kompose.version: 1.28.0 (c4137012e)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/docker-default: "true"
+        io.kompose.service: worker
+    spec:
+      containers:
+        - args:
+            - /usr/spark/bin/spark-class
+            - org.apache.spark.deploy.worker.Worker
+            - spark://master:7077
+          env:
+            - name: MASTER
+              value: spark://master:7077
+            - name: SPARK_CONF_DIR
+              value: /conf
+            - name: SPARK_WORKER_CORES
+              value: "2"
+            - name: SPARK_WORKER_MEMORY
+              value: 1g
+            - name: SPARK_WORKER_PORT
+              value: "8881"
+            - name: SPARK_WORKER_WEBUI_PORT
+              value: "8081"
+          image: deleteme
+          name: worker
+          ports:
+            - containerPort: 8081
+            - containerPort: 7012
+            - containerPort: 7013
+            - containerPort: 7014
+            - containerPort: 7015
+            - containerPort: 7016
+            - containerPort: 8881
+          resources: {}
+          volumeMounts:
+            - mountPath: /conf
+              name: worker-claim0
+            - mountPath: /tmp/data
+              name: worker-claim1
+      hostname: worker
+      restartPolicy: Always
+      volumes:
+        - name: worker-claim0
+          persistentVolumeClaim:
+            claimName: worker-claim0
+        - name: worker-claim1
+          persistentVolumeClaim:
+            claimName: worker-claim1
+status: {}

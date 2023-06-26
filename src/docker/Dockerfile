@@ -1,5 +1,4 @@
 FROM anapsix/alpine-java
-MAINTAINER Riyad Parvez "riyad.parvez@gmail.com"
 
 RUN apk add --update curl git unzip python3 py-pip && pip install -U py4j
 
@@ -10,7 +9,7 @@ ENV PYTHONHASHSEED=0 \
     HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop \
     PATH=$PATH:$HADOOP_HOME/bin \
     SPARK_VERSION=1.6.1 \
-    SPARK_PACKAGE=spark-$SPARK_VERSION-bin-without-hadoop \
+    SPARK_PACKAGE=spark-1.6.1-bin-without-hadoop \
     SPARK_HOME=/usr/spark-$SPARK_VERSION \
     PYSPARK_PYTHON=python3
 RUN curl -sL --retry 3 \
@@ -22,7 +21,7 @@ RUN curl -sL --retry 3 \
 ENV SPARK_DIST_CLASSPATH="$HADOOP_HOME/etc/hadoop/*:$HADOOP_HOME/share/hadoop/common/lib/*:$HADOOP_HOME/share/hadoop/common/*:$HADOOP_HOME/share/hadoop/hdfs/*:$HADOOP_HOME/share/hadoop/hdfs/lib/*:$HADOOP_HOME/share/hadoop/hdfs/*:$HADOOP_HOME/share/hadoop/yarn/lib/*:$HADOOP_HOME/share/hadoop/yarn/*:$HADOOP_HOME/share/hadoop/mapreduce/lib/*:$HADOOP_HOME/share/hadoop/mapreduce/*:$HADOOP_HOME/share/hadoop/tools/lib/*" \
     PATH=$PATH:$SPARK_HOME/bin
 RUN curl -sL --retry 3 \
-  "http://d3kbcqa49mib13.cloudfront.net/$SPARK_PACKAGE.tgz" \
+  "https://archive.apache.org/dist/spark/spark-$SPARK_VERSION/$SPARK_PACKAGE.tgz" \
   | gunzip \
   | tar x -C /usr/ \
   && mv /usr/$SPARK_PACKAGE $SPARK_HOME \
